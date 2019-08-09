@@ -145,7 +145,9 @@ static int PlaybackOpen(Context_t  *context, PlayFiles_t *pFiles)
         if(!extension)
         {
             playback_err("Wrong extension (%s)\n", context->playback->uri+7);
-            return cERR_PLAYBACK_ERROR;
+            free(context->playback->uri);
+	    context->playback->uri = NULL;
+	    return cERR_PLAYBACK_ERROR;
         }
     } 
     else if (strstr(uri, "://")) 
@@ -165,6 +167,8 @@ static int PlaybackOpen(Context_t  *context, PlayFiles_t *pFiles)
     else
     {
         playback_err("Unknown stream (%s)\n", uri);
+	free(context->playback->uri);
+        context->playback->uri = NULL;
         return cERR_PLAYBACK_ERROR;
     }
 
@@ -174,6 +178,8 @@ static int PlaybackOpen(Context_t  *context, PlayFiles_t *pFiles)
         ||  (context->container->selectedContainer->Command(context, CONTAINER_INIT, pFiles) < 0))
     {
         playback_err("CONTAINER_ADD failed\n");
+	free(context->playback->uri);
+	context->playback->uri = NULL;
         return cERR_PLAYBACK_ERROR;
     }
 
